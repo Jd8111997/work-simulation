@@ -1,9 +1,11 @@
+// api/src/app.module.ts
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { TranscriptModule } from './transcript/transcript.module';
 
 @Module({
-  imports: [],
+  imports: [TranscriptModule],
   controllers: [AppController],
   providers: [AppService],
 })
