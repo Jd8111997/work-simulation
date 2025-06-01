@@ -37,4 +37,39 @@ export class ApiService {
       throw error;
     }
   }
+
+  static async getStats(): Promise<any> {
+    try {
+        console.log('🔄 Fetching analytics from:', `${API_BASE_URL}/transcript/stats`);
+        const response = await fetch(`${API_BASE_URL}/transcript/stats`);
+        console.log('📡 Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('❌ Error fetching analytics:', error);
+        throw error;
+    }
+  }
+
+  static async getQAHistory(limit: number = 20): Promise<any[]> {
+    try {
+      console.log('🔄 Fetching Q&A history from:', `${API_BASE_URL}/transcript/history`);
+      const response = await fetch(`${API_BASE_URL}/transcript/history?limit=${limit}`);
+      console.log('📡 Response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Received Q&A history:', data.length, 'entries');
+      return data;
+    } catch (error) {
+      console.error('❌ Error fetching Q&A history:', error);
+      throw error;
+    }
+  }
 }

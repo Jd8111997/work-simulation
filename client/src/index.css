@@ -1,7 +1,4 @@
 /* client/src/index.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* Optional: Add some custom base styles */
 @layer base {

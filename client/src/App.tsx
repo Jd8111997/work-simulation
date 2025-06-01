@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import TranscriptDisplay from './components/TranscriptDisplay';
 import QuestionForm from './components/QuestionForm';
 import QAHistoryComponent from './components/QAHistory';
+import Analytics from './components/Analytics';
 import { ApiService } from './services/api';
 import type { TranscriptEntry, QAHistory } from './types/transcript';
 import './App.css';
@@ -13,9 +14,12 @@ function App() {
   const [transcriptError, setTranscriptError] = useState<string | null>(null);
   const [questionLoading, setQuestionLoading] = useState(false);
   const [qaHistory, setQaHistory] = useState<QAHistory[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [analyticsRefreshTrigger, setAnalyticsRefreshTrigger] = useState(0);
 
   useEffect(() => {
     loadTranscript();
+    loadQAHistory();
   }, []);
 
   const loadTranscript = async () => {
@@ -31,6 +35,20 @@ function App() {
     }
   };
 
+  const loadQAHistory = async () => {
+    try {
+      setHistoryLoading(true);
+      const historyData = await ApiService.getQAHistory(20);
+      setQaHistory(historyData);
+      console.log('✅ Loaded', historyData.length, 'Q&A history entries from database');
+    } catch (error) {
+      console.warn('⚠️ Could not load Q&A history:', error);
+      setQaHistory([]);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
   const handleQuestionSubmit = async (question: string) => {
     try {
       setQuestionLoading(true);
@@ -42,11 +60,24 @@ function App() {
         response,
         timestamp: new Date()
       };
-      
+      // Add to the beginning of the history
       setQaHistory(prev => [newEntry, ...prev]);
+      // Trigger analytics refresh
+      setAnalyticsRefreshTrigger(prev => prev + 1);
     } catch (error) {
       console.error('Error submitting question:', error);
-      // You could add error handling UI here
+      const errorEntry: QAHistory = {
+        id: Date.now().toString(),
+        question,
+        response: {
+          question,
+          answer: `Error: ${error instanceof Error ? error.message : 'Failed to get response'}`,
+          relevantQuotes: [],
+          confidence: 0,
+        },
+        timestamp: new Date()
+      };
+      setQaHistory(prev => [errorEntry, ...prev]);
     } finally {
       setQuestionLoading(false);
     }
@@ -65,9 +96,9 @@ function App() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           {/* Left Column - Transcript Display */}
-          <div className="space-y-6">
+          <div className="xl:col-span-1">
             <TranscriptDisplay
               transcript={transcript}
               loading={transcriptLoading}
@@ -75,8 +106,8 @@ function App() {
             />
           </div>
 
-          {/* Right Column - Question Form and History */}
-          <div className="space-y-6">
+          {/* Middle Column - Question Form and History */}
+          <div className="xl:col-span-1 space-y-6">
             <QuestionForm
               onSubmit={handleQuestionSubmit}
               loading={questionLoading}
@@ -84,6 +115,12 @@ function App() {
             
             <QAHistoryComponent history={qaHistory} />
           </div>
+
+          {/* Right Column - Analytics */}
+          <div className="xl:col-span-1">
+            <Analytics refreshTrigger={analyticsRefreshTrigger} />
+          </div>
+
         </div>
 
         {/* Retry button for transcript loading errors */}

@@ -4,9 +4,21 @@ import type { QAHistory } from '../types/transcript';
 
 interface QAHistoryProps {
   history: QAHistory[];
+  loading?: boolean;
 }
 
-const QAHistoryComponent: React.FC<QAHistoryProps> = ({ history }) => {
+const QAHistoryComponent: React.FC<QAHistoryProps> = ({ history, loading = false }) => {
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Question & Answer History</h2>
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+          <span className="ml-2 text-gray-600">Loading history...</span>
+          </div>
+        </div>
+        );
+    }
   if (history.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
