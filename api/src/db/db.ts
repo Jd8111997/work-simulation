@@ -33,7 +33,6 @@ export class SimpleDbService {
   private pool: Pool;
 
   constructor() {
-    console.log(process.env.DB_PASSWORD)
     this.pool = new Pool({
       host:  'db',
       port: parseInt( '5432'),
