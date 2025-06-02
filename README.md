@@ -68,8 +68,7 @@ This system allows users to ask natural language questions about a therapy sessi
 | `Get`     | `/transcript`            | Get the therapy session transcript        |
 | `Post`    | `/transcript/question`     | Ask a question about the transcript      |
 | `Get`     | `/transcript/stats`             | Get usage analytics and statistics   |
-| `Get`     | `/transcript/history`          | Get Q&A history from the database
-   |
+| `Get`     | `/transcript/history`          | Get Q&A history from the database  |
 
 ## Example API Usage
 ```
